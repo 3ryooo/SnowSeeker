@@ -12,14 +12,52 @@ struct ContentView: View {
     
     @State private var searchText = ""
     
+    @State private var sortedBy = "default"
+    
     var filteredResorts: [Resort] {
+        
+        var tempResorts = resorts
+        
         if searchText.isEmpty {
-            resorts
+            tempResorts = resorts
         } else {
-            resorts.filter { $0.name.localizedStandardContains(searchText) }
+            tempResorts = resorts.filter { $0.name.localizedStandardContains(searchText) }
         }
-    }
+        
+        switch sortedBy {
+        case "default":
+            return tempResorts
+        case "name":
+            return tempResorts.sorted {
+                let p1 = $0.name.localizedCaseInsensitiveContains(searchText)
+                let p2 = $1.name.localizedCaseInsensitiveContains(searchText)
 
+                if p1 && !p2 {
+                    return true
+                } else if !p1 && p2 {
+                    return false
+                }
+
+                return $0.name < $1.name
+            }
+        case "country":
+            return tempResorts.sorted {
+                let p1 = $0.country.localizedCaseInsensitiveContains(searchText)
+                let p2 = $1.country.localizedCaseInsensitiveContains(searchText)
+
+                if p1 && !p2 {
+                    return true
+                } else if !p1 && p2 {
+                    return false
+                }
+
+                return $0.country < $1.country
+            }
+        default:
+            return tempResorts
+        }
+        
+    }
     
     var body: some View {
         NavigationSplitView {
@@ -58,6 +96,18 @@ struct ContentView: View {
                 ResortView(resort: resort)
             }
             .searchable(text: $searchText, prompt: "Search for a resort")
+            .toolbar() {
+                Menu("Sort", systemImage: "arrow.up.arrow.down") {
+                    Picker("Sort", selection: $sortedBy) {
+                        Text("None")
+                            .tag("default")
+                        Text("Sort by Name")
+                            .tag("name")
+                        Text("Sort by Country")
+                            .tag("country")
+                    }
+                }
+            }
 
         } detail: {
             WelcomeView()
