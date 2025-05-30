@@ -15,9 +15,8 @@ class Favorites {
     
     init() {
         // 保存されたデータを読み込む
-        
-        // データがなければ空の配列を使用
-        resorts = []
+        let resortsArray = UserDefaults.standard.stringArray(forKey: key) ?? [String]()
+        resorts = Set(resortsArray)
     }
     
     // 指定されたリゾートがセットに含まれているかどうかを返す
@@ -38,6 +37,7 @@ class Favorites {
     }
     
     func save() {
-        // データを書き出す
+        let resortsArray = Array(resorts)
+        UserDefaults.standard.set(resortsArray, forKey: key)
     }
 }
