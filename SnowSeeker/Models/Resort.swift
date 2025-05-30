@@ -22,4 +22,9 @@ struct Resort: Codable, Hashable, Identifiable {
     var elevation: Int
     var runs: Int
     var facilities: [String]
+    
+    var facilityTypes: [Facility] {
+        facilities.map(Facility.init)
+    }
+    
 }
